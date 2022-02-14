@@ -1,0 +1,64 @@
+SWAP ( x y -- y x )
+DUP ( x -- x x )
+OVER ( x1 x2 -- x1 x2 x1 )
+ROT ( x1 x2 x3 -- x2 x3 x1 |Rotates 3 last elements )
+-ROT ( x1 x2 x3 -- x3 x1 x2 )
+
+\ comments:
+\ until the end of the line
+( until the closing )
+.( this will be printed when the code is evaluated )
+
+marker --mymarker-- ( where --mymarker-- can be anything, -- is a convention )
+
+: square ( n -- n^2 ) dup * ;
+/ when overwriting existing definitions, new word will hide the older word
+/ already existing definitions will still use the old code
+
+WORDS ( -- lists all defined words of the forth system )
+VARIABLE ccc ( -- defines a variable with the name ccc )
+/ example
+VARIABLE ccc [RTN]
+ccc ( -- addr |Puts the memory address of the variable on the stack )
+
+! ( x addr -- stores the value of x into the memory addr ) 
+200 ccc ! ( stores the value 200 into the variable ccc )
+@ ( addr -- x |Reads the value from memory location addr on the stack )
+. ( x -- Prints the top value from the stack )
+/ @, !, +! work with variables or with any memory location, like a pointer in "C" or "PEEK" and "POKE" in BASIC 
+
+/ control structures can be used in definiton, not in the interactive mode
+: abs ( n1 -- +n2 ) dup 0 < if negate then ;
+/ if takes a value, if it is 0 (false) it jumps to the then or else
+/ <, =, >, <>, <=, >=, (might be not standard) compares two values, produces a flag (0 or -1 (which is true))
+
+: min ( n1 n2 -- n )
+	2dup < if
+		drop
+	else
+		nip
+	then ;
+/ 2dup is ( n1 n2 -- n1 n2 n1 n2 )
+hex true u. decimal true . false .
+/ AND, OR, XOR and 0= and INVERT work bitwise, need well-formed flags (0 or -1)
+
+/ again jumps to begin
+: endless ( -- )
+ 0 begin
+   dup . 1+
+again ;
+
+/ emit puts an ascii/utf-8 char on screen
+/ char reads the next char from the input and places its ascii value
+97 emit
+char A emit
+
+/ set-dir changes the current path
+s" ~" set-dir
+/ sh executes os commands
+sh sh ( executes the shell )
+/ the word system will execute a string in the os 
+: vi s" vi" system ;
+
+/ include loads source code from file
+include mysource.4th
